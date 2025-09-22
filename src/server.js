@@ -15,7 +15,7 @@ export function setupServer() {
   app.use(cors());
   app.use(pino());
 
-  app.use(contactRoutes);
+  app.use('/contacts', contactRoutes);
   app.use(notFoundHandler);
   app.use(errorHandler);
 
