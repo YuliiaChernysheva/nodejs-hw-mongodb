@@ -1,0 +1,73 @@
+import createHttpError from 'http-errors';
+import { UserModel } from '../models/user.js';
+import bcrypt from 'bcrypt';
+import { FIFTEEN_MINUTES, THIRTY_DAYS } from '../constants/index.js';
+import { randomBytes } from 'crypto';
+import { Session } from '../models/session.js';
+
+export const userRegisterService = async (body) => {
+  const user = await UserModel.findOne({ email: body.email });
+
+  if (user) {
+    throw createHttpError(409, 'Email in use');
+  }
+
+  const hashPassword = await bcrypt.hash(body.password, 10);
+
+  return await UserModel.create({ ...body, password: hashPassword });
+};
+
+export const userLoginService = async ({ email, password }) => {
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    throw createHttpError(401, 'Email or password is wrong');
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw createHttpError(401, 'Email or password is wrong');
+  }
+
+  await Session.deleteOne({ userId: user._id });
+  const accessToken = randomBytes(30).toString('base64');
+  const refreshToken = randomBytes(30).toString('base64');
+
+  return await Session.create({
+    userId: user._id,
+    accessToken,
+    refreshToken,
+
+    accessTokenValidUntil: new Date(Date.now() + FIFTEEN_MINUTES),
+    refreshTokenValidUntil: new Date(Date.now() + THIRTY_DAYS),
+  });
+};
+
+export async function refreshSession(sessionId, refreshToken) {
+  const session = await Session.findById(sessionId);
+
+  if (session === null) {
+    throw new createHttpError.Unauthorized('Session not found');
+  }
+
+  if (session.refreshToken !== refreshToken) {
+    throw new createHttpError.Unauthorized('Refresh token is invalid');
+  }
+
+  if (session.refreshTokenValidUntil < new Date()) {
+    throw new createHttpError.Unauthorized('Refresh token is expired');
+  }
+
+  await Session.deleteOne({ _id: session._id });
+
+  return Session.create({
+    userId: session.userId,
+    accessToken: crypto.randomBytes(30).toString('base64'),
+    refreshToken: crypto.randomBytes(30).toString('base64'),
+    accessTokenValidUntil: new Date(Date.now() + 15 * 60 * 1000),
+    refreshTokenValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+  });
+}
+
+export async function logoutUser(sessionId) {
+  await Session.deleteOne({ _id: sessionId });
+}
