@@ -70,5 +70,5 @@ export async function logoutUserController(req, res) {
   res.clearCookie('sessionId');
   res.clearCookie('refreshToken');
 
-  res.send({ status: 200 });
+  res.status(204).send();
 }

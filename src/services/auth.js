@@ -2,7 +2,7 @@ import createHttpError from 'http-errors';
 import { UserModel } from '../models/user.js';
 import bcrypt from 'bcrypt';
 import { FIFTEEN_MINUTES, THIRTY_DAYS } from '../constants/index.js';
-import { randomBytes } from 'crypto';
+import crypto from 'node:crypto';
 import { Session } from '../models/session.js';
 
 export const userRegisterService = async (body) => {
@@ -29,8 +29,8 @@ export const userLoginService = async ({ email, password }) => {
   }
 
   await Session.deleteOne({ userId: user._id });
-  const accessToken = randomBytes(30).toString('base64');
-  const refreshToken = randomBytes(30).toString('base64');
+  const accessToken = crypto.randomBytes(30).toString('base64');
+  const refreshToken = crypto.randomBytes(30).toString('base64');
 
   return await Session.create({
     userId: user._id,
