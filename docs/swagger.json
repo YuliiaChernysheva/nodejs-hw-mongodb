@@ -308,7 +308,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "contactId",
             "required": true,
             "schema": {
               "type": "string",
@@ -369,7 +369,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "contactId",
             "required": true,
             "schema": {
               "type": "string",
@@ -378,11 +378,10 @@
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/contact"
+                "$ref": "#/components/schemas/patchContact"
               }
             }
           }
@@ -409,6 +408,7 @@
                       "example": "Contact updated successfully"
                     },
                     "data": {
+                      "type": "object",
                       "$ref": "#/components/schemas/contact"
                     }
                   }
@@ -445,7 +445,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "contactId",
             "required": true,
             "schema": {
               "type": "string",
@@ -454,29 +454,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Contact deleted successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Contact deleted successfully"
-                    }
-                  }
-                }
-              }
-            }
+          "204": {
+            "description": "Contact deleted successfully"
           },
           "401": {
             "$ref": "#/components/responses/401"
@@ -832,12 +811,7 @@
           "_id",
           "name",
           "phoneNumber",
-          "contactType",
-          "email",
-          "isFavourite",
-          "userId",
-          "createdAt",
-          "updatedAt"
+          "contactType"
         ],
         "properties": {
           "_id": {
@@ -882,6 +856,7 @@
           "photo": {
             "description": "Link to contact's photo",
             "type": "string",
+            "default": null,
             "example": "https://res.cloudinary.com/uqwgdu/image/upload/image.png"
           },
           "createdAt": {
@@ -893,6 +868,45 @@
             "type": "string",
             "format": "date-time",
             "example": "2025-10-08T18:21:10.157+00:00"
+          }
+        }
+      },
+      "patchContact": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Contact's name",
+            "type": "string",
+            "example": "John Doe"
+          },
+          "phoneNumber": {
+            "description": "Contact's phone number",
+            "type": "string",
+            "example": "+380000000006"
+          },
+          "contactType": {
+            "description": "Contact's type",
+            "type": "string",
+            "enum": [
+              "work",
+              "home",
+              "personal"
+            ]
+          },
+          "email": {
+            "description": "Contact's email",
+            "type": "string",
+            "example": "JohnDoe@gmail.com"
+          },
+          "isFavourite": {
+            "description": "Contact's favourite",
+            "type": "boolean",
+            "example": false
+          },
+          "photo": {
+            "description": "Contact's photo (binary upload)",
+            "type": "string",
+            "format": "binary"
           }
         }
       }
