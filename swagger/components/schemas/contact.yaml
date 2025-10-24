@@ -6,9 +6,6 @@ required:
   - contactType
   - email
   - isFavourite
-  - userId
-  - createdAt
-  - updatedAt
 
 properties:
   _id:
