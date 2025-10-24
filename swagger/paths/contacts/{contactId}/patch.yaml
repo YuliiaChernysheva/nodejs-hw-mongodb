@@ -13,6 +13,7 @@ parameters:
       type: string
       example: '65ca67e7ae7f10c88b598384'
 requestBody:
+  required: true
   content:
     multipart/form-data:
       schema:
@@ -61,7 +62,21 @@ responses:
               type: string
               example: Contact updated successfully
             data:
-              $ref: '../../../components/schemas/contact.yaml'
+              type: object
+              properties:
+                name:
+                  type: string
+                phoneNumber:
+                  type: string
+                contactType:
+                  type: string
+                email:
+                  type: string
+                isFavourite:
+                  type: boolean
+                photo:
+                  type: string
+                  format: binary
   '400':
     $ref: '../../../components/responses/400.yaml'
   '401':
