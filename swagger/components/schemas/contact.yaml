@@ -4,8 +4,6 @@ required:
   - name
   - phoneNumber
   - contactType
-  - email
-  - isFavourite
 
 properties:
   _id:
